@@ -1,39 +1,45 @@
 pipeline {
     agent any
+     environment {
+        max = 50
+        random_num = "${Math.abs(new Random().nextInt(max+1))}"
+    }
     tools{
-        maven 'maven_3_5_0'
+        maven 'maven396'
     }
     stages{
+
         stage('Build Maven'){
             steps{
-                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Java-Techie-jt/devops-automation']]])
-                sh 'mvn clean install'
+               checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/patelramesh541/devops-automation']])
+
+                bat 'mvn clean install'
             }
         }
-        stage('Build docker image'){
+         stage('Build docker image'){
             steps{
                 script{
-                    sh 'docker build -t javatechie/devops-integration .'
+                    bat 'docker build -t rameshlpatel/devops-integration .'
                 }
             }
         }
         stage('Push image to Hub'){
             steps{
                 script{
-                   withCredentials([string(credentialsId: 'dockerhub-pwd', variable: 'dockerhubpwd')]) {
-                   sh 'docker login -u javatechie -p ${dockerhubpwd}'
-
-}
-                   sh 'docker push javatechie/devops-integration'
+                   bat 'docker login -u rameshlpatel -p Hetika1234$'
+                   bat 'docker push rameshlpatel/devops-integration'
                 }
             }
         }
-        stage('Deploy to k8s'){
+        stage('Azure container deploy '){
             steps{
-                script{
-                    kubernetesDeploy (configs: 'deploymentservice.yaml',kubeconfigId: 'k8sconfigpwd')
-                }
+                withCredentials([azureServicePrincipal('ad1cbdba-8f60-4f60-b1fb-16eed9e9c470')]) {
+                     bat 'az login --service-principal -u %AZURE_CLIENT_ID% -p %AZURE_CLIENT_SECRET% -t %AZURE_TENANT_ID%'
+                     bat 'az container create --resource-group devops-automation --name mycontainer --image registry.hub.docker.com/rameshlpatel/devops-integration:latest --dns-name-label ramesh-te --ports 8080'
+}
             }
         }
+
     }
+
 }
