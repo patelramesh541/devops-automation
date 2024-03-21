@@ -9,13 +9,19 @@ pipeline {
     }
     stages{
 
-        stage('Build Maven'){
-            steps{
-               checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/patelramesh541/devops-automation']])
+        stage('spotless Check'){
+                   steps{
+                      checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/patelramesh541/devops-automation']])
+                       bat 'mvn spotless:check'
+                   }
+               }
 
-                bat 'mvn clean install'
-            }
-        }
+          stage('Build Maven'){
+                     steps{
+                        checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/patelramesh541/devops-automation']])
+                         bat 'mvn clean install'
+                     }
+                 }
          stage('Build docker image'){
             steps{
                 script{

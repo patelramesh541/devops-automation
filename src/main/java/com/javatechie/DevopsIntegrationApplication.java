@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DevopsIntegrationApplication {
 
-	@GetMapping
-	public String message(){
-		return "welcome ramesh !";
-	}
+    @GetMapping
+    public String message() {
+        return "welcome ramesh !";
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(DevopsIntegrationApplication.class, args);
-	}
+    public static void main(String[] args) {
 
+        SpringApplication.run(DevopsIntegrationApplication.class, args);
+    }
 }
